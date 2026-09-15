@@ -27,6 +27,19 @@ python3 mst_algorithms.py
 * **Standard MST:** All three algorithms calculate the identical optimal MST with a total weight of **32**.
 * **Failure Simulation:** After removing a critical edge, the optimal path adjusts to a total weight of **34**.
 
+## Project Report (PDF)
+
+The repository includes a detailed report (`MST_Algorithms_Report.pdf`) which provides:
+* A theoretical introduction to the graph and the assignment objectives.
+* Step-by-step execution traces for Prim's, Kruskal's, and Borůvka's algorithms.
+* An in-depth analysis of the edge/node failure simulation and network resilience.
+
+## AI Tools Usage Disclosure
+
+The following AI tools were used to assist in the completion of this project:
+* **Claude (Anthropic)**
+* **Gemini (Google)**
+
 ## Status
 
 - [x] Task 1 — Prim's algorithm
