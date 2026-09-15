@@ -1,6 +1,6 @@
 # Graph Theory HW2 — Minimum Spanning Tree
 
-Informatics ITS Graph Theory class — Group ___ (fill in group number/members)
+Informatics ITS Graph Theory class — Group 5
 
 ## Algorithm: Borůvka's Algorithm (task 3 — independent algorithm)
 
