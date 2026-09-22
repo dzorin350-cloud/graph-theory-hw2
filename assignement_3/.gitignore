@@ -1,0 +1,12 @@
+# Binaries and build artifacts
+bin/
+*.o
+*.out
+
+# Python cache
+__pycache__/
+*.pyc
+
+# LibreOffice profile temp directory
+report/lo_profile/
+
