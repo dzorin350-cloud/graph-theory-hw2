@@ -1,6 +1,6 @@
 # Graph Theory HW — Terminal Graph Visualizer
 
-**Informatics ITS Graph Theory class**
+**Informatics ITS Graph Theory class - Group 5**
 
 This project is a simple terminal program for the Week 5 graph-matrix homework.
 
@@ -69,14 +69,6 @@ Then enter:
 ```
 
 Each column represents one undirected edge and must contain exactly two `1` values.
-
-## Notes
-
-* The program handles undirected graphs.
-* The interface and visualization are entirely terminal based.
-* A simple BFS is used to choose the spanning tree.
-* Fundamental matrices can change if another spanning tree is chosen.
-* Matrix columns follow the edge order `e1, e2, ...`.
 
 ## AI Tools Usage Disclosure
 
