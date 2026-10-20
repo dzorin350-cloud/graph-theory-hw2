@@ -23,7 +23,7 @@ For **Task 2 (CPP Simulator)**, specific external libraries are required. Instal
 pip install streamlit streamlit-folium folium osmnx networkx pandas scipy
 ```
 
-_(Tasks 1 and 3 rely only on the standard Python library unless specified otherwise by Melvyn)._
+_(Tasks 1 and 3 rely only on the standard Python library.)_
 
 ---
 
@@ -31,32 +31,75 @@ _(Tasks 1 and 3 rely only on the standard Python library unless specified otherw
 
 **Author:** Melvyn
 
-### Problem Description
+### Problem Description & Algorithm
 
-[MELVYN: Please insert a brief explanation of the problem and the algorithm/heuristic you used to solve it here.]
+This task solves the **Asymmetric Travelling Salesman Problem (ATSP)** to model efficient delivery routing (such as an SPPG vehicle delivering mealboxes to schools and returning to the depot). Given a directed distance matrix `D` where vertex `0` represents the depot, `1..n-1` represent schools, and `D[i][j]` is the non-negative travel cost from location `i` to location `j` (`math.inf` if an arc is unavailable), the goal is to find a minimum-cost closed tour that visits every location exactly once and returns to the depot.
+
+The solver (`tsp_solver.py`) implements an exact **Branch & Bound** algorithm with zero third-party dependencies:
+
+- **Greedy Initial Incumbent:** A nearest-neighbor heuristic is run first to quickly establish a valid upper bound (`best_cost`), which helps prune the search tree early.
+- **Iterative Depth-First Search (DFS):** The search uses an explicit stack rather than recursion to avoid hitting Python's recursion limit. Successor nodes are pushed in reversed greedy order so that shorter, more promising arcs are explored first.
+- **Dominance Pruning (State Caching):** Partial paths are represented by the state `(last_vertex, visited_bitmask)`. If the solver reaches a state with a prefix cost greater than or equal to a previously recorded cost for that exact state, the branch is pruned immediately.
+- **Admissible Lower Bounds:** Before expanding a partial tour, the solver computes an admissible lower bound on the cost required to complete the tour by taking the maximum of:
+  1. **Minimum Outgoing-Edge Bound:** The sum of the cheapest valid outgoing arc from the current vertex and each remaining unvisited school.
+  2. **Minimum Incoming-Edge Bound:** The sum of the cheapest valid incoming arc into each remaining unvisited school and back into the depot.
+  3. **Directed Cut-Set Bounds:** For the set of remaining unvisited schools (as well as optional school clusters), any valid tour completion must both enter the subset and exit the subset back toward the depot.
+- **Timeout Handling:** Supports a configurable deadline (`timeout_s`, defaulting to `30.0` seconds). If the search completes before the deadline, `optimal=True` certifies global optimality (or proves infeasibility if `route=[]`).
 
 ### How to Run
 
-[MELVYN: Provide the terminal command to run your script here.]
+To run the built-in demonstration case directly from the terminal:
 
 ```bash
-# Example: python3 tsp_solver.py
+python3 tsp_solver.py
+```
+
+To run the automated unit test suite (which validates the Branch & Bound solver against an exhaustive brute-force oracle across edge cases and random directed matrices):
+
+```bash
+python3 -m unittest -v test_solver.py
+```
+
+You can also import the solver directly in your own Python scripts:
+
+```python
+from tsp_solver import solve_tsp
+
+D = [
+    [0, 4, 2],
+    [3, 0, 6],
+    [7, 1, 0]
+]
+result = solve_tsp(D, timeout_s=30.0)
+print(result)
 ```
 
 ### Sample Case
 
-[MELVYN: Provide a sample input and expected output here.]
-**Input:**
+**Input (Asymmetric Distance Matrix `D`):**
 
 ```text
-[Insert sample input]
+[
+  [0, 4, 2],
+  [3, 0, 6],
+  [7, 1, 0]
+]
 ```
 
 **Output:**
 
 ```text
-[Insert sample output]
+{
+  'route': [0, 2, 1, 0],
+  'distance': 6.0,
+  'elapsed_s': 0.00012,
+  'optimal': True,
+  'explored_nodes': 3,
+  'pruned_nodes': 1
+}
 ```
+
+_(Explanation: Starting from depot `0`, travelling `0 -> 2` costs `2`, `2 -> 1` costs `1`, and returning `1 -> 0` costs `3`, yielding the proven optimal total distance of `6.0`.)_
 
 ---
 
