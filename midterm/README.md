@@ -20,86 +20,43 @@ To run all tasks in this repository, you will need **Python 3.8+**.
 For **Task 2 (CPP Simulator)**, specific external libraries are required. Install them using `pip`:
 
 ```bash
-pip install streamlit streamlit-folium folium osmnx networkx pandas scipy
+pip install streamlit streamlit-folium folium osmnx networkx pandas scipy shapely pyproj
 ```
 
 _(Tasks 1 and 3 rely only on the standard Python library.)_
 
 ---
 
-## Task 1: Travelling Salesman Problem (TSP)
+## Task 1: Travelling Salesman Problem (TSP) — SPPG Simulator
 
-**Author:** Melvyn
+**Author:** Melvyn  
+**Demo area:** Paris (local OSM extract); the assignment originally requires **Surabaya**.
 
 ### Problem Description & Algorithm
 
-This task solves the **Asymmetric Travelling Salesman Problem (ATSP)** to model efficient delivery routing (such as an SPPG vehicle delivering mealboxes to schools and returning to the depot). Given a directed distance matrix `D` where vertex `0` represents the depot, `1..n-1` represent schools, and `D[i][j]` is the non-negative travel cost from location `i` to location `j` (`math.inf` if an arc is unavailable), the goal is to find a minimum-cost closed tour that visits every location exactly once and returns to the depot.
+The goal is to find the shortest delivery tour that starts at an SPPG, visits **every school** within a chosen radius once, and returns to the SPPG. Road segments may be reused. The implementation models the road network as a **directed graph**, so one-way streets can produce different A→B and B→A distances.
 
-The solver (`tsp_solver.py`) implements an exact **Branch & Bound** algorithm with zero third-party dependencies:
-
-- **Greedy Initial Incumbent:** A nearest-neighbor heuristic is run first to quickly establish a valid upper bound (`best_cost`), which helps prune the search tree early.
-- **Iterative Depth-First Search (DFS):** The search uses an explicit stack rather than recursion to avoid hitting Python's recursion limit. Successor nodes are pushed in reversed greedy order so that shorter, more promising arcs are explored first.
-- **Dominance Pruning (State Caching):** Partial paths are represented by the state `(last_vertex, visited_bitmask)`. If the solver reaches a state with a prefix cost greater than or equal to a previously recorded cost for that exact state, the branch is pruned immediately.
-- **Admissible Lower Bounds:** Before expanding a partial tour, the solver computes an admissible lower bound on the cost required to complete the tour by taking the maximum of:
-  1. **Minimum Outgoing-Edge Bound:** The sum of the cheapest valid outgoing arc from the current vertex and each remaining unvisited school.
-  2. **Minimum Incoming-Edge Bound:** The sum of the cheapest valid incoming arc into each remaining unvisited school and back into the depot.
-  3. **Directed Cut-Set Bounds:** For the set of remaining unvisited schools (as well as optional school clusters), any valid tour completion must both enter the subset and exit the subset back toward the depot.
-- **Timeout Handling:** Supports a configurable deadline (`timeout_s`, defaulting to `30.0` seconds). If the search completes before the deadline, `optimal=True` certifies global optimality (or proves infeasibility if `route=[]`).
+- **Local OSM (`osm_data.py`):** reads `Paris_Gambetta_500m.osm`, filters road edges for vehicle access (approximately), and extracts `amenity=school` locations. No Overpass requests are required during computation.
+- **Shortest paths:** NetworkX Dijkstra computes directed road distances between the SPPG and schools, producing a distance matrix; unreachable pairs have infinite cost.
+- **Exact TSP (`held_karp.py`):** Held–Karp dynamic programming finds a minimum-cost visit order, then reconstructs the full tour. Its time complexity is **O(m² · 2^m)** and memory complexity **O(m · 2^m)** for **m schools**. The interface stops if more than **15 schools** are selected.
+- **Visualisation (`app.py`):** Streamlit and Folium display the school order, route, total distance, estimated time and *solver-only* execution time.
 
 ### How to Run
 
-To run the built-in demonstration case directly from the terminal:
+From the Task 1 directory:
 
 ```bash
-python3 tsp_solver.py
+python -m pip install -r requirements.txt
+streamlit run app.py
 ```
 
-To run the automated unit test suite (which validates the Branch & Bound solver against an exhaustive brute-force oracle across edge cases and random directed matrices):
+Choose an SPPG on the Paris map (default **48.8575, 2.3815**), set the radius (**0.2–1.5 km**, default **0.5 km**) and click **Calculate Route**.
 
-```bash
-python3 -m unittest -v test_solver.py
-```
+### Sample Case & Observed Output
 
-You can also import the solver directly in your own Python scripts:
+A Paris demo selected **11 schools**. The displayed tour was **5.78 km**, with **0.049141 s** for Held–Karp and an estimated **11.6 min** at a fixed 30 km/h. However, the entire application took **over 10 minutes** to produce the result: XML processing and road-distance calculation are **not included** in the solver time.
 
-```python
-from tsp_solver import solve_tsp
-
-D = [
-    [0, 4, 2],
-    [3, 0, 6],
-    [7, 1, 0]
-]
-result = solve_tsp(D, timeout_s=30.0)
-print(result)
-```
-
-### Sample Case
-
-**Input (Asymmetric Distance Matrix `D`):**
-
-```text
-[
-  [0, 4, 2],
-  [3, 0, 6],
-  [7, 1, 0]
-]
-```
-
-**Output:**
-
-```text
-{
-  'route': [0, 2, 1, 0],
-  'distance': 6.0,
-  'elapsed_s': 0.00012,
-  'optimal': True,
-  'explored_nodes': 3,
-  'pruned_nodes': 1
-}
-```
-
-_(Explanation: Starting from depot `0`, travelling `0 -> 2` costs `2`, `2 -> 1` costs `1`, and returning `1 -> 0` costs `3`, yielding the proven optimal total distance of `6.0`.)_
+**Limitations:** the current sample uses Paris instead of required Surabaya; the local extract restricts the selectable area, car-access filtering is approximate.
 
 ---
 
