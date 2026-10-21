@@ -106,14 +106,25 @@ In graph terms, every square is a vertex and two squares are connected by an edg
 
 ### Algorithm
 
-**Backtracking DFS + Warnsdorff's Heuristic**
+The solver runs in two phases (full analysis in [Knights_Tour_Report.pdf](task3/Knights_Tour_Report.pdf)):
 
-- **Warnsdorff's rule (1823):** from the current square, always move to the unvisited square that has the **fewest onward moves**. Squares that are hard to reach (corners, edges) get visited first, before they become dead ends.
-- **Backtracking:** if the knight gets stuck before visiting every square, the last move is undone and the next candidate is tried. This makes the search **complete**: `path not found` is printed only when no tour exists.
-- **Colour pruning:** a knight changes square colour on every move. On a board with an odd number of squares, a tour must start on the majority colour (`x + y` even), so other starts are rejected immediately.
-- The search is iterative (explicit stack), so large boards do not hit Python's recursion limit.
+- **Pre-checks (instant answers):**
+  - _Colour argument:_ a knight changes square colour at every move. On a board with an odd number of squares, a tour must start where `x + y` is even.
+  - _4 × n argument:_ on a board 4 squares wide, every move from an outer line lands on an inner line, so a tour must start on an outer line.
+- **Phase 1, Warnsdorff's rule (1823):** always jump to the unvisited square with the **fewest onward moves**, so corners and edges are visited before they become dead ends. It is greedy and linear, and it is tried with 16 deterministic and 200 random (fixed seed) tie-breaking rules.
+- **Phase 2, backtracking with pruning:** if every greedy attempt fails, a complete DFS (iterative, Warnsdorff-ordered) explores all paths. It cuts a branch as soon as a square becomes unreachable, two squares are forced to be the end of the tour, or the unvisited squares are disconnected. This keeps the answer correct: `path not found` is printed only when no tour exists.
 
-**Complexity:** Warnsdorff alone runs in $\mathcal{O}(N \cdot M)$ and almost never needs to backtrack on boards with a tour. The worst case (proving that no tour exists) is exponential, but this only happens on small boards such as 3×3 or 4×4.
+**Complexity:** with V = columns × rows, building the graph and each Warnsdorff attempt cost $\mathcal{O}(V)$ time and memory, so Phase 1 is $\mathcal{O}(V)$. Phase 2 is exponential in the worst case (Hamiltonian path is NP-complete), but in practice it is only needed to prove that small boards such as 3×3 or 4×4 have no tour.
+
+### Files
+
+| File | Role |
+| --- | --- |
+| `task3/knights_tour.py` | entry point: reads the input, prints the result |
+| `task3/search.py` | pre-checks, phase 1 (Warnsdorff), phase 2 (backtracking) |
+| `task3/board.py` | knight's graph, degrees, Warnsdorff ordering |
+| `task3/display.py` | text board and terminal simulator |
+| `task3/Knights_Tour_Report.pdf` | report: analysis, walkthrough, complexity |
 
 ### Input / Output Format
 
@@ -126,7 +137,7 @@ In graph terms, every square is a vertex and two squares are connected by an edg
 
 ### How to Run & Sample Cases
 
-To run the script, use standard input to pass the board size and starting coordinates.
+From the `midterm/task3` folder, pass the board size and starting coordinates on standard input.
 
 **Sample output (5×5, starting at the centre):**
 
@@ -157,4 +168,28 @@ _Output:_
 
 ```text
 path not found
+```
+
+### Simulator Options
+
+```bash
+printf "5 5\n2 2\n" | python3 knights_tour.py --board                  # also print the numbered board
+printf "5 5\n2 2\n" | python3 knights_tour.py --simulate               # animate the search in the terminal
+printf "4 4\n0 0\n" | python3 knights_tour.py --simulate --delay 0.02  # watch the backtracking
+```
+
+`--board` output for the sample (numbers = visiting order):
+
+```text
++----+----+----+----+----+
+| 23 | 16 | 11 |  6 | 21 |
++----+----+----+----+----+
+| 10 |  5 | 22 | 17 | 12 |
++----+----+----+----+----+
+| 15 | 24 |  1 | 20 |  7 |
++----+----+----+----+----+
+|  4 |  9 | 18 | 13 |  2 |
++----+----+----+----+----+
+| 25 | 14 |  3 |  8 | 19 |
++----+----+----+----+----+
 ```
