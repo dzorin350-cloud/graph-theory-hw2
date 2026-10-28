@@ -1,0 +1,27 @@
+# Two wheels sharing a cut vertex X, a pendant tree and an isolated
+# vertex Z (expected: planar). Exercises block decomposition.
+# Wheel 1: hub X, rim a b c d e
+X a
+X b
+X c
+X d
+X e
+a b
+b c
+c d
+d e
+e a
+# Wheel 2: hub h, rim X p q r (shares X with wheel 1)
+h X
+h p
+h q
+h r
+X p
+p q
+q r
+r X
+# Pendant tree
+e t1
+t1 t2
+t1 t3
+Z

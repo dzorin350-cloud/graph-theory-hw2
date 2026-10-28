@@ -1,0 +1,6 @@
+# Square A-B-C-D with one diagonal A-C (expected: planar)
+A B
+B C
+C D
+D A
+A C

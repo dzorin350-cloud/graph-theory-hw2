@@ -1,0 +1,17 @@
+# Planar triangle T plus a subdivided K3,3 in another component
+# (expected: NOT planar). The K3,3 edges u1-v1 and u2-v2 are split by
+# extra vertices s1 and s2, so the graph is only a subdivision of K3,3.
+t1 t2
+t2 t3
+t3 t1
+u1 s1
+s1 v1
+u1 v2
+u1 v3
+u2 v1
+u2 s2
+s2 v2
+u2 v3
+u3 v1
+u3 v2
+u3 v3

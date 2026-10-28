@@ -1,0 +1,20 @@
+# Petersen graph: 10 vertices, 15 edges (expected: NOT planar)
+# It passes the Euler bound (15 <= 24), so the real test is needed.
+# Outer cycle
+0 1
+1 2
+2 3
+3 4
+4 0
+# Spokes
+0 5
+1 6
+2 7
+3 8
+4 9
+# Inner pentagram
+5 7
+7 9
+9 6
+6 8
+8 5

@@ -1,0 +1,11 @@
+# Complete bipartite graph K3,3 - "three utilities" (expected: NOT planar)
+# Houses: H1 H2 H3   Utilities: Gas Water Power
+H1 Gas
+H1 Water
+H1 Power
+H2 Gas
+H2 Water
+H2 Power
+H3 Gas
+H3 Water
+H3 Power
