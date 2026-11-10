@@ -1,0 +1,4 @@
+# Invalid: a negative distance
+2 2
+10 -5
+20 30

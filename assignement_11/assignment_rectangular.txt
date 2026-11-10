@@ -1,0 +1,5 @@
+# 3 technicians, 4 sites: one site will remain unused
+3 4
+12 7 15 9
+8 14 11 6
+13 10 5 12

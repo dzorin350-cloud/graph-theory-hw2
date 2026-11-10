@@ -1,0 +1,7 @@
+# 4 maintenance teams, 4 factory sites
+# Distances in kilometers (each row is one team)
+4 4
+22 48 41 98
+85 71 39 23
+95 87 68 23
+49 54 23 91
