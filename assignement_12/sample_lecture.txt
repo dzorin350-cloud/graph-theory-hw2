@@ -1,0 +1,11 @@
+# Network from the lecture slides (W12, page 4) - expected max flow: 6
+source S
+sink T
+S A 5
+S B 2
+A C 2
+A B 2
+B D 4
+D C 1
+C T 3
+D T 5

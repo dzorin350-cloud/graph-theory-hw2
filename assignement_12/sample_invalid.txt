@@ -1,0 +1,5 @@
+# Invalid input: negative capacity
+source S
+sink T
+S A 3
+A T -2

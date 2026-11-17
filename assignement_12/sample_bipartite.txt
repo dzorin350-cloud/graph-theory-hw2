@@ -1,0 +1,11 @@
+# Maximum bipartite matching from the lecture (W12, pages 11-15)
+# V1 = {a, b}, V2 = {c, d}; every capacity is 1. Expected max flow: 2 (a-d, b-c)
+source s
+sink t
+s a 1
+s b 1
+a c 1
+a d 1
+b c 1
+c t 1
+d t 1
